@@ -40,6 +40,7 @@
   .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px}
   .brand svg{width:34px;height:34px}
   .who{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px}
+  .outbtn{background:var(--surface);border:1px solid var(--line);color:var(--text);border-radius:10px;height:36px;padding:0 16px;font:600 13px inherit;white-space:nowrap;cursor:pointer;display:inline-flex;align-items:center;gap:6px}.outbtn:hover{border-color:var(--blue);color:var(--blue)}
   .avatar{width:34px;height:34px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:700}
   .adm{color:var(--blue);font-weight:600;text-decoration:none;border:1px solid var(--blue);border-radius:10px;padding:7px 12px;font-size:13px}
   .iconbtn{background:var(--surface);border:1px solid var(--line);color:var(--text);border-radius:10px;width:36px;height:36px;cursor:pointer;font-size:16px}
@@ -206,7 +207,7 @@ function pillClass(s){return s==='Approved'?'p-Approved':(['Declined','Cancelled
 function render(){
   var first=D.user.name.split(' ')[0];
   var h='<header><div class="brand">'+logo()+'<span>'+esc(D.company)+' Leave</span></div>'+
-    '<div class="who">'+(D.isAdmin?'<a class="adm" href="'+D.adminUrl+'">Admin</a>':'')+'<button class="iconbtn" onclick="startTour(false)" title="Show the guide">?</button><button class="iconbtn" id="tTheme" onclick="toggleTheme()" title="Switch theme">◐</button>'+(SID?'<button class="mini" style="margin:0" onclick="signOutNow()">Sign out</button>':'')+'<span>'+esc(D.user.name)+'</span><div class="avatar">'+esc(first[0])+'</div></div></header>';
+    '<div class="who">'+(D.isAdmin?'<a class="adm" href="'+D.adminUrl+'">Admin</a>':'')+'<button class="iconbtn" onclick="startTour(false)" title="Show the guide">?</button><button class="iconbtn" id="tTheme" onclick="toggleTheme()" title="Switch theme">◐</button>'+(SID?'<button class="outbtn" onclick="signOutNow()" title="Sign out">Sign out</button>':'')+'<span>'+esc(D.user.name)+'</span><div class="avatar">'+esc(first[0])+'</div></div></header>';
   h+='<div class="hero">'+flo()+'<div class="bubble" id="say">Hi <b>'+esc(first)+'</b>! I’m Flo. Tap a leave type below to see your balance, then fill in the form to request time off.</div></div>';
 
   h+='<div class="grid tiles" id="tTiles">';

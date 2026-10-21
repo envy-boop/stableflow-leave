@@ -39,7 +39,8 @@
   .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px}
   .brand svg{width:32px;height:32px}
   .role{font-size:11px;font-weight:700;color:var(--blue);background:rgba(35,144,248,.14);padding:4px 10px;border-radius:99px}
-  .right{display:flex;gap:8px;align-items:center}
+  .right{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .outbtn{background:var(--surface);border:1px solid var(--line);color:var(--text);border-radius:10px;height:36px;padding:0 16px;font:600 13px inherit;white-space:nowrap;cursor:pointer;display:inline-flex;align-items:center;gap:6px}.outbtn:hover{border-color:var(--blue);color:var(--blue)}
   .lnk{color:var(--blue);font-weight:600;text-decoration:none;border:1px solid var(--blue);border-radius:10px;padding:7px 12px;font-size:13px}
   .iconbtn{background:var(--surface);border:1px solid var(--line);color:var(--text);border-radius:10px;width:36px;height:36px;cursor:pointer}
   .seg{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;gap:2px}
@@ -189,7 +190,7 @@ function people(list,empty){
 
 function render(){
   var k=D.kpis, lbl={1:'Last month',3:'Last 3 months',6:'Last 6 months',12:'Last year'};
-  var h='<header><div class="brand">'+logo()+'<span>'+esc(D.company)+' Leave Admin</span><span class="role">'+esc(D.role)+'</span></div><div class="right"><a class="lnk" href="'+D.appUrl+'">My leave</a>'+(SID?'<button class="iconbtn" onclick="signOutNow()">Sign out</button>':'')+'<button class="iconbtn" onclick="toggleTheme()" title="Switch theme">◐</button></div></header>';
+  var h='<header><div class="brand">'+logo()+'<span>'+esc(D.company)+' Leave Admin</span><span class="role">'+esc(D.role)+'</span></div><div class="right"><a class="lnk" href="'+D.appUrl+'">My leave</a>'+(SID?'<button class="outbtn" onclick="signOutNow()" title="Sign out">Sign out</button>':'')+'<button class="iconbtn" onclick="toggleTheme()" title="Switch theme">◐</button></div></header>';
 
   h+='<div class="bar-top"><div class="sub">Leave that started between '+fmt(D.from)+' and '+fmt(D.today)+'</div><div class="seg">'+
     [[1,'1 month'],[3,'3 months'],[6,'6 months'],[12,'1 year']].map(function(p){return '<button class="'+(MONTHS===p[0]?'on':'')+'" onclick="setMonths('+p[0]+')">'+p[1]+'</button>';}).join('')+'</div></div>';
