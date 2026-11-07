@@ -190,7 +190,7 @@ function people(list,empty){
 
 function render(){
   var k=D.kpis, lbl={1:'Last month',3:'Last 3 months',6:'Last 6 months',12:'Last year'};
-  var h='<header><div class="brand">'+logo()+'<span>'+esc(D.company)+' Leave Admin</span><span class="role">'+esc(D.role)+'</span></div><div class="right"><a class="lnk" href="'+D.appUrl+'">My leave</a>'+(SID?'<button class="outbtn" onclick="signOutNow()" title="Sign out">Sign out</button>':'')+'<button class="iconbtn" onclick="toggleTheme()" title="Switch theme">◐</button></div></header>';
+  var h='<header><div class="brand">'+logo()+'<span>'+esc(D.company)+' Leave Admin</span><span class="role">'+esc(D.role)+'</span></div><div class="right"><a class="lnk" href="index.html">My leave</a>'+(SID?'<button class="outbtn" onclick="signOutNow()" title="Sign out">Sign out</button>':'')+'<button class="iconbtn" onclick="toggleTheme()" title="Switch theme">◐</button></div></header>';
 
   h+='<div class="bar-top"><div class="sub">Leave that started between '+fmt(D.from)+' and '+fmt(D.today)+'</div><div class="seg">'+
     [[1,'1 month'],[3,'3 months'],[6,'6 months'],[12,'1 year']].map(function(p){return '<button class="'+(MONTHS===p[0]?'on':'')+'" onclick="setMonths('+p[0]+')">'+p[1]+'</button>';}).join('')+'</div></div>';
