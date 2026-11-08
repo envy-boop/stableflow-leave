@@ -83,6 +83,57 @@
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--blue);color:#fff;padding:12px 18px;border-radius:12px;display:none;z-index:9}
   .center{min-height:60vh;display:grid;place-items:center;text-align:center}
 </style>
+<style>
+  /* ===== Redesign: tabs, calmer layout, gentle motion ===== */
+  :root{--ease:cubic-bezier(.2,.7,.2,1)}
+  body{-webkit-font-smoothing:antialiased}
+  .wrap{padding:16px 16px 40px}
+  .hero{display:flex;gap:14px;align-items:center;margin:2px 0 14px}
+  .flo{width:54px;flex:none;animation:floaty 3s ease-in-out infinite}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+  .bubble{background:var(--surface);border:1px solid var(--line);border-radius:16px 16px 16px 4px;padding:10px 14px;box-shadow:var(--shadow);font-size:14px;max-width:640px}
+  .bubble b{color:var(--blue)}
+  .link{background:none;border:0;padding:0;color:var(--blue);font:600 13px inherit;cursor:pointer}.link:hover{text-decoration:underline}
+  .toolbar{position:sticky;top:8px;z-index:20;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:0 0 18px}
+  .tabs{display:flex;gap:4px;padding:5px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow-x:auto;scrollbar-width:none;flex:1 1 auto;min-width:0}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{flex:1 0 auto;background:transparent;border:0;color:var(--muted);font:600 14px Inter,"Segoe UI",Roboto,Arial,sans-serif;padding:10px 16px;border-radius:10px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:background .18s,color .18s}
+  .tabs button:hover{color:var(--text);background:var(--surface2)}
+  .tabs button.on{background:var(--blue);color:#fff}
+  .bdg{font-style:normal;min-width:19px;height:19px;padding:0 5px;border-radius:99px;background:var(--warn);color:#0B1220;font-size:11px;font-weight:700;display:inline-grid;place-items:center}
+  .seg{box-shadow:var(--shadow)}
+  .seg button{padding:9px 12px;transition:background .18s,color .18s}
+  .pane{display:none}
+  .pane.on{display:block;animation:fadeUp .3s var(--ease)}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .sech{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin:4px 2px 12px}
+  .sech h3{margin:0;font-size:16px}
+  .card{transition:border-color .2s,transform .2s var(--ease)}
+  .clickable{cursor:pointer}.clickable:hover{transform:translateY(-2px);border-color:var(--blue)}
+  .kpi.hl.clickable:hover{border-color:#fff}
+  .ic{width:36px;height:36px;flex:none;border-radius:50%;background:rgba(35,144,248,.14);color:var(--blue);display:grid;place-items:center;font-weight:700}
+  .req .rq-top{display:flex;gap:12px;align-items:flex-start}
+  .req .quote{margin:12px 0 0 48px;color:var(--muted);font-size:13.5px;font-style:italic}
+  .req .flag{margin:8px 0 0 48px}
+  .req .rq-foot{margin:12px 0 0 48px}
+  .req .act{margin:4px 0 0 48px}
+  .req.open{border-color:var(--blue)}
+  .actbtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .btn{transition:background .18s,border-color .18s}.b-soft:hover{border:1px solid var(--blue)}
+  .empty{text-align:center;color:var(--muted);padding:26px}
+  input:focus,textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(35,144,248,.18)}
+  button:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+  tr:hover td{background:var(--surface2)}
+  @media(max-width:600px){
+    .flo{width:42px}.bubble{font-size:13px}
+    .toolbar{top:4px}.tabs{flex-basis:100%}.tabs{display:grid;grid-template-columns:1fr 1fr}.tabs button{padding:9px 10px;font-size:13px}
+    .seg{margin-left:auto}
+    .req .quote,.req .flag,.req .rq-foot,.req .act{margin-left:0}
+    .kpi .n{font-size:26px}
+    .kpis{grid-template-columns:1fr 1fr;gap:10px}.kpi{padding:14px}.kpi .l{font-size:12px}
+  }
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
 </head>
 <body>
 <div class="wrap" id="app"><div class="center"><div class="card">Loading admin dashboard…</div></div></div>
@@ -188,39 +239,63 @@ function people(list,empty){
   return list.length?list.map(function(a){return '<div class="item"><div><div>'+esc(a.name)+'</div><div class="sub">'+esc(a.dept)+' · '+esc(a.type)+'</div></div><div class="sub" style="text-align:right">'+rng(a.start,a.end)+'<br>back '+fmt(a.back)+'</div></div>';}).join(''):'<div class="sub">'+empty+'</div>';
 }
 
+var ATAB='overview';
+try{var st=localStorage.getItem('sf-atab');if(st)ATAB=st;}catch(e){}
+function flo(){return '<svg class="flo" viewBox="0 0 80 90"><line x1="40" y1="6" x2="40" y2="16" stroke="#2390F8" stroke-width="3"/><circle cx="40" cy="6" r="4" fill="#2390F8"/><rect x="10" y="16" width="60" height="50" rx="18" fill="#2390F8"/><rect x="18" y="26" width="44" height="28" rx="12" fill="#0B1220"/><circle cx="31" cy="39" r="5" fill="#fff"/><circle cx="49" cy="39" r="5" fill="#fff"/><path d="M33 48q7 5 14 0" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/><rect x="22" y="68" width="36" height="16" rx="8" fill="#1F6FD0"/></svg>';}
+function showTab(t){
+  ATAB=t;try{localStorage.setItem('sf-atab',t);}catch(e){}
+  document.querySelectorAll('.tabs button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-t')===t);});
+  document.querySelectorAll('.pane').forEach(function(p){p.classList.toggle('on',p.getAttribute('data-t')===t);});
+}
+function floSay(){
+  var k=D.kpis,mine=D.pending.filter(function(p){return p.token;}).length;
+  if(!k.pending)return 'All caught up. No requests are waiting for a decision. 🎉';
+  return '<b>'+k.pending+'</b> request'+(k.pending===1?' is':'s are')+' waiting for a decision'+(mine?', and <b>'+mine+'</b> '+(mine===1?'is':'are')+' yours to review.':'.')+' <button class="link" onclick="showTab(\'approvals\')">Open approvals →</button>';
+}
+
 function render(){
   var k=D.kpis, lbl={1:'Last month',3:'Last 3 months',6:'Last 6 months',12:'Last year'};
   var h='<header><div class="brand">'+logo()+'<span>'+esc(D.company)+' Leave Admin</span><span class="role">'+esc(D.role)+'</span></div><div class="right"><a class="lnk" href="index.html">My leave</a>'+(SID?'<button class="outbtn" onclick="signOutNow()" title="Sign out">Sign out</button>':'')+'<button class="iconbtn" onclick="toggleTheme()" title="Switch theme">◐</button></div></header>';
 
-  h+='<div class="bar-top"><div class="sub">Leave that started between '+fmt(D.from)+' and '+fmt(D.today)+'</div><div class="seg">'+
-    [[1,'1 month'],[3,'3 months'],[6,'6 months'],[12,'1 year']].map(function(p){return '<button class="'+(MONTHS===p[0]?'on':'')+'" onclick="setMonths('+p[0]+')">'+p[1]+'</button>';}).join('')+'</div></div>';
+  h+='<div class="hero">'+flo()+'<div class="bubble">'+floSay()+'</div></div>';
 
-  h+='<div class="grid kpis">'+
-    '<div class="card kpi hl"><div class="l">Waiting for a decision</div><div class="n">'+k.pending+'</div><div class="l">pending requests</div></div>'+
+  var tabs=[['overview','Overview'],['approvals','Approvals'],['reports','Reports'],['people','People']];
+  h+='<div class="toolbar"><nav class="tabs" role="tablist">'+tabs.map(function(t){
+    return '<button role="tab" data-t="'+t[0]+'" class="'+(ATAB===t[0]?'on':'')+'" onclick="showTab(\''+t[0]+'\')">'+t[1]+(t[0]==='approvals'&&k.pending?'<i class="bdg">'+k.pending+'</i>':'')+'</button>';
+  }).join('')+'</nav><div class="seg" title="Period for reports">'+
+    [[1,'1M'],[3,'3M'],[6,'6M'],[12,'1Y']].map(function(p){return '<button class="'+(MONTHS===p[0]?'on':'')+'" onclick="setMonths('+p[0]+')" title="'+lbl[p[0]]+'">'+p[1]+'</button>';}).join('')+'</div></div>';
+
+  /* ---------- Overview ---------- */
+  h+='<section class="pane'+(ATAB==='overview'?' on':'')+'" data-t="overview"><div class="grid kpis">'+
+    '<div class="card kpi hl clickable" onclick="showTab(\'approvals\')"><div class="l">Waiting for a decision</div><div class="n">'+k.pending+'</div><div class="l">pending requests →</div></div>'+
     '<div class="card kpi"><div class="l">Away today</div><div class="n">'+k.away+'</div><div class="l">people on leave</div></div>'+
     '<div class="card kpi"><div class="l">Returning within 5 days</div><div class="n">'+k.returning+'</div><div class="l">welcome-back soon</div></div>'+
-    '<div class="card kpi"><div class="l">Leave taken · '+lbl[MONTHS]+'</div><div class="n">'+num(k.taken)+'</div><div class="l">days across '+k.requests+' request'+(k.requests===1?'':'s')+'</div></div></div>';
+    '<div class="card kpi clickable" onclick="showTab(\'reports\')"><div class="l">Leave taken · '+lbl[MONTHS]+'</div><div class="n">'+num(k.taken)+'</div><div class="l">days across '+k.requests+' request'+(k.requests===1?'':'s')+'</div></div></div>'+
+    '<div class="grid two"><div class="card"><h3>Away today</h3>'+people(D.away,'Everyone is in today.')+'</div>'+
+    '<div class="card"><h3>Returning within 5 days</h3>'+people(D.returning,'No one is due back in the next 5 days.')+'</div></div>'+
+    '<div class="card" style="margin-top:14px"><h3>Upcoming leave <span class="sub">next 30 days</span></h3>'+people(D.upcoming,'No approved leave coming up.')+'</div></section>';
 
-  h+='<div class="card" style="margin-top:14px"><h3>Pending requests <span class="sub">oldest first</span></h3>'+
-    (D.pending.length?D.pending.map(function(p,i){
+  /* ---------- Approvals ---------- */
+  h+='<section class="pane'+(ATAB==='approvals'?' on':'')+'" data-t="approvals"><div class="sech"><h3>Pending requests</h3><span class="sub">Oldest first</span></div>'+
+    (D.pending.length?'<div class="grid">'+D.pending.map(function(p,i){
       var wait=p.waiting===0?'today':p.waiting+' day'+(p.waiting===1?'':'s')+' ago';
-      return '<div class="item" style="align-items:flex-start"><div style="flex:1;min-width:0"><div><b>'+esc(p.name)+'</b> · '+esc(p.type)+' · '+num(p.days)+' day'+(p.days===1?'':'s')+'</div>'+
-        '<div class="sub">'+esc(p.dept)+' · '+rng(p.start,p.end)+' · requested '+wait+'</div>'+
-        (p.reason?'<div class="sub">“'+esc(p.reason)+'”</div>':'')+(p.flags?'<div class="flag">⚠ '+esc(p.flags)+'</div>':'')+
-        '<div class="act" id="act'+i+'" style="'+(OPEN===i?'display:block':'')+'"><textarea id="note'+i+'" placeholder="Comment (required if declining or asking for changes)"></textarea><div style="display:flex;gap:8px;margin-top:8px"><button class="btn b-ok" onclick="go('+i+',\'approve\')">Approve</button><button class="btn b-soft" onclick="go('+i+',\'changes\')">Ask for changes</button><button class="btn b-no" onclick="go('+i+',\'decline\')">Decline</button></div><div class="err" id="err'+i+'"></div></div></div>'+
-        '<div style="text-align:right"><span class="pill '+(p.final?'p-final':'p-pend')+'">'+(p.final?'FINAL APPROVAL':'PENDING')+'</span><div style="margin-top:8px">'+
-        (p.token?'<button class="btn b-soft" onclick="openAct('+i+')">Review</button>':'<div class="sub">Waiting on '+esc(p.approver||'no approver')+'</div>')+'</div></div></div>';
-    }).join(''):'<div class="sub">All caught up. No pending requests. 🎉</div>')+'</div>';
+      return '<div class="card req'+(OPEN===i?' open':'')+'"><div class="rq-top"><div class="ic">'+esc(String(p.name).charAt(0))+'</div><div style="flex:1;min-width:0">'+
+        '<div><b>'+esc(p.name)+'</b> <span class="sub">· '+esc(p.dept)+'</span></div>'+
+        '<div class="sub">'+esc(p.type)+' · '+num(p.days)+' day'+(p.days===1?'':'s')+' · '+rng(p.start,p.end)+' · requested '+wait+'</div></div>'+
+        '<span class="pill '+(p.final?'p-final':'p-pend')+'">'+(p.final?'FINAL APPROVAL':'PENDING')+'</span></div>'+
+        (p.reason?'<div class="quote">“'+esc(p.reason)+'”</div>':'')+(p.flags?'<div class="flag">⚠ '+esc(p.flags)+'</div>':'')+
+        '<div class="rq-foot">'+(p.token?'<button class="btn b-soft" onclick="openAct('+i+')">Review</button>':'<div class="sub">Waiting on '+esc(p.approver||'no approver')+'</div>')+'</div>'+
+        '<div class="act" id="act'+i+'" style="'+(OPEN===i?'display:block':'')+'"><textarea id="note'+i+'" placeholder="Comment (required if declining or asking for changes)"></textarea><div class="actbtns"><button class="btn b-ok" onclick="go('+i+',\'approve\')">Approve</button><button class="btn b-soft" onclick="go('+i+',\'changes\')">Ask for changes</button><button class="btn b-no" onclick="go('+i+',\'decline\')">Decline</button></div><div class="err" id="err'+i+'"></div></div></div>';
+    }).join('')+'</div>':'<div class="card empty">All caught up. No pending requests. 🎉</div>')+'</section>';
 
-  h+='<div class="grid two"><div class="card"><h3>Away today</h3>'+people(D.away,'Everyone is in today.')+'</div>'+
-     '<div class="card"><h3>Returning within 5 days</h3>'+people(D.returning,'No one is due back in the next 5 days.')+'</div></div>';
+  /* ---------- Reports ---------- */
+  h+='<section class="pane'+(ATAB==='reports'?' on':'')+'" data-t="reports"><div class="sech"><h3>'+lbl[MONTHS]+'</h3><span class="sub">Leave that started between '+fmt(D.from)+' and '+fmt(D.today)+'</span></div>'+
+    '<div class="grid kpis"><div class="card kpi"><div class="l">Days taken</div><div class="n">'+num(k.taken)+'</div></div><div class="card kpi"><div class="l">Requests</div><div class="n">'+k.requests+'</div></div></div>'+
+    '<div class="grid two"><div class="card"><h3>By leave type</h3>'+bars(D.byType,'No leave taken in this period.')+'</div>'+
+    '<div class="card"><h3>By department</h3>'+bars(D.byDept,'No leave taken in this period.')+'</div></div></section>';
 
-  h+='<div class="card" style="margin-top:14px"><h3>Upcoming leave <span class="sub">next 30 days</span></h3>'+people(D.upcoming,'No approved leave coming up.')+'</div>';
-
-  h+='<div class="grid two"><div class="card"><h3>By leave type <span class="sub">'+lbl[MONTHS]+'</span></h3>'+bars(D.byType,'No leave taken in this period.')+'</div>'+
-     '<div class="card"><h3>By department <span class="sub">'+lbl[MONTHS]+'</span></h3>'+bars(D.byDept,'No leave taken in this period.')+'</div></div>';
-
-  h+='<div class="card" style="margin-top:14px"><h3>People <span class="sub">'+lbl[MONTHS]+'</span></h3><input class="s" id="q" placeholder="Search by name or department" oninput="drawPeople()"><div class="scroll" id="ptab"></div></div>';
+  /* ---------- People ---------- */
+  h+='<section class="pane'+(ATAB==='people'?' on':'')+'" data-t="people"><div class="card"><h3>People <span class="sub">'+lbl[MONTHS]+'</span></h3><input class="s" id="q" placeholder="Search by name or department" oninput="drawPeople()"><div class="scroll" id="ptab"></div></div></section>';
 
   document.getElementById('app').innerHTML=h;
   drawPeople();
@@ -233,7 +308,7 @@ function drawPeople(){
     (rows.length?rows.map(function(p){return '<tr><td>'+esc(p.name)+'</td><td>'+esc(p.dept)+'</td><td class="r">'+p.count+'</td><td class="r">'+num(p.taken)+'</td><td class="r">'+(p.remaining==null?'—':num(p.remaining))+'</td></tr>';}).join(''):'<tr><td colspan="5" class="sub">No matches.</td></tr>')+'</table>';
 }
 
-function openAct(i){OPEN=i;document.querySelectorAll('.act').forEach(function(el){el.style.display='none';});document.getElementById('act'+i).style.display='block';}
+function openAct(i){OPEN=i;document.querySelectorAll('.req').forEach(function(el){el.classList.remove('open');});document.querySelectorAll('.act').forEach(function(el){el.style.display='none';});var c=document.getElementById('act'+i);if(c&&c.closest)c.closest('.req').classList.add('open');document.getElementById('act'+i).style.display='block';}
 
 function go(i,decision){
   var note=document.getElementById('note'+i).value,err=document.getElementById('err'+i);err.textContent='';
