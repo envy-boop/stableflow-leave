@@ -145,6 +145,72 @@
   .center{min-height:70vh;display:grid;place-items:center;text-align:center;padding:24px}
   .center .card{max-width:440px}
 </style>
+<style>
+  /* ===== Redesign: tabs, calmer layout, gentle motion ===== */
+  :root{--radius:16px;--ease:cubic-bezier(.2,.7,.2,1)}
+  body{-webkit-font-smoothing:antialiased}
+  .wrap{padding:16px 16px 40px}
+  header{padding:6px 0 14px}
+  .hero{align-items:center;margin:2px 0 14px}
+  .flo{width:58px}
+  .bubble{font-size:14px;padding:10px 14px;transition:opacity .2s}
+  /* tab bar */
+  .tabs{position:sticky;top:8px;z-index:20;display:flex;gap:4px;padding:5px;margin:0 0 18px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow-x:auto;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{flex:1 0 auto;background:transparent;border:0;color:var(--muted);font:600 14px Inter,"Segoe UI",Roboto,Arial,sans-serif;padding:10px 16px;border-radius:10px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:background .18s,color .18s}
+  .tabs button:hover{color:var(--text);background:var(--surface2)}
+  .tabs button.on{background:var(--blue);color:#fff}
+  .bdg{font-style:normal;min-width:19px;height:19px;padding:0 5px;border-radius:99px;background:var(--warn);color:#0B1220;font-size:11px;font-weight:700;display:inline-grid;place-items:center}
+  /* panes */
+  .pane{display:none}
+  .pane.on{display:block;animation:fadeUp .3s var(--ease)}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .sech{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:4px 2px 10px}
+  .sech h3{margin:0;font-size:15px}
+  .cardh{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+  .cardh h3{margin:0}
+  .card{border-radius:var(--radius);transition:border-color .2s,transform .2s var(--ease),box-shadow .2s}
+  .tile{transition:transform .2s var(--ease),border-color .2s}
+  .tile:hover{transform:translateY(-2px);border-color:var(--blue)}
+  .two{grid-template-columns:1fr 1fr;margin-top:16px}
+  @media(max-width:820px){.two{grid-template-columns:1fr}}
+  /* lists */
+  .list .item{align-items:flex-start;padding:12px 0}
+  .ic{width:34px;height:34px;flex:none;border-radius:10px;background:rgba(35,144,248,.14);color:var(--blue);display:grid;place-items:center;font-weight:700;font-size:14px}
+  .ic.soft{background:var(--surface2);color:var(--muted);border-radius:50%}
+  .it{font-weight:600}
+  .note{font-size:12.5px;color:var(--muted);margin-top:4px;font-style:italic}
+  .acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .acts .mini{margin-top:0}
+  .mini{transition:border-color .18s,color .18s}.mini:hover{border-color:var(--blue);color:var(--blue)}
+  .empty{color:var(--muted);font-size:13.5px;text-align:center;padding:18px 8px}
+  .link{background:none;border:0;padding:0;color:var(--blue);font:600 13px inherit;cursor:pointer}
+  .link:hover{text-decoration:underline}
+  .btn.sm{width:auto;padding:9px 16px;font-size:13.5px;margin-top:12px}
+  .btn{transition:background .18s,transform .12s}.btn:active{transform:scale(.99)}
+  /* request form */
+  .formwrap{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px;align-items:start}
+  .side{position:sticky;top:76px}
+  .up{text-transform:uppercase;letter-spacing:.05em;font-size:11.5px}
+  .sidebal{display:flex;align-items:center;gap:14px;margin:10px 0 6px}
+  .sidebal .name{font-weight:600}
+  .after{background:var(--surface2);border-radius:10px;padding:9px 12px;font-size:13px;margin-top:8px}
+  .tips{margin-top:12px;border-top:1px solid var(--line);padding-top:10px;font-size:12.5px;color:var(--muted);display:grid;gap:8px}
+  .tips b{color:var(--text)}
+  #hoBox{margin-top:16px;border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+  #hoBox summary{cursor:pointer;color:var(--blue);font-weight:600}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(35,144,248,.18)}
+  button:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+  .calgrid{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);align-items:start}
+  @media(max-width:820px){.formwrap,.calgrid{grid-template-columns:1fr}.side{position:static}}
+  @media(max-width:600px){
+    .flo{width:44px}.bubble{font-size:13px;padding:9px 12px}
+    .tabs{top:4px;margin-bottom:14px}.tabs{display:grid;grid-template-columns:1fr 1fr}.tabs button{padding:9px 10px;font-size:13px}
+    .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .list .item{flex-wrap:wrap}
+  }
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
 </head>
 <body>
 <div class="wrap" id="app"><div class="center"><div class="card">Loading your leave dashboard…</div></div></div>
@@ -253,54 +319,111 @@ function init(data){
 
 function pillClass(s){return s==='Approved'?'p-Approved':(['Declined','Cancelled','Withdrawn'].indexOf(s)>-1?'p-Declined':'p-pend');}
 
+var TAB='home';
+var TABS=[['home','Home'],['req','Request leave'],['mine','My requests'],['cal','Team calendar']];
+var HINT={
+  home:function(f){return 'Hi <b>'+esc(f)+'</b>! Here’s your leave at a glance. Tap a balance to start a request.';},
+  req:function(){return 'Pick a leave type and your dates. I’ll skip weekends and public holidays for you.';},
+  mine:function(){return 'Every request you’ve sent is here, with its status. You can withdraw, edit or cancel where it’s allowed.';},
+  cal:function(){return 'See who’s off and when public holidays fall. Tap your first and last day to fill in a request.';}
+};
+function showTab(t,quiet){
+  TAB=t;
+  document.querySelectorAll('.tabs button').forEach(function(b){var on=b.getAttribute('data-t')===t;b.classList.toggle('on',on);b.setAttribute('aria-selected',on?'true':'false');});
+  document.querySelectorAll('.pane').forEach(function(p){p.classList.toggle('on',p.getAttribute('data-t')===t);});
+  if(t==='cal')drawCal();
+  if(t==='req')setTimeout(updSide,0);
+  if(!quiet&&D)say(HINT[t](D.user.name.split(' ')[0]));
+}
+function pendCount(){return D.requests.filter(function(r){return /Pending|Submitted|Changes/.test(r.status);}).length;}
+function reqItem(r,i,withActs){
+  var acts='';
+  if(withActs){
+    if(r.canEdit)acts+='<button class="mini" onclick="editReq('+i+')">Edit &amp; resubmit</button>';
+    if(r.canWithdraw)acts+='<button class="mini" onclick="act(this,\'withdraw\','+i+')">Withdraw</button>';
+    if(r.canCancel)acts+='<button class="mini" onclick="act(this,\'cancel\','+i+')">Cancel leave</button>';
+  }
+  return '<div class="item"><div class="ic">'+esc(r.type.charAt(0))+'</div><div style="flex:1;min-width:0"><div class="it">'+esc(r.type)+' · '+num(r.days)+' day'+(r.days===1?'':'s')+'</div>'+
+    '<div class="sub">'+range(r.start,r.end)+' · '+esc(r.id)+(r.coverStatus?' · Cover '+esc(r.coverStatus.toLowerCase()):'')+'</div>'+
+    (r.comment?'<div class="note">“'+esc(r.comment)+'”</div>':'')+
+    (acts?'<div class="acts">'+acts+'</div>':'')+'</div>'+
+    '<span class="pill '+pillClass(r.status)+'">'+esc(r.status.replace('Pending Manager Review','Pending'))+'</span></div>';
+}
+function awayList(){
+  return D.away.length?D.away.map(function(a){return '<div class="item"><div class="ic soft">'+esc(String(a.name).charAt(0))+'</div><div style="flex:1">'+esc(a.name)+'</div><div class="sub">'+range(a.start,a.end)+'</div></div>';}).join(''):'<div class="empty">Everyone is in. 🎉</div>';
+}
+
 function render(){
-  var first=D.user.name.split(' ')[0];
+  var first=D.user.name.split(' ')[0],pend=pendCount();
   var h='<header><div class="brand">'+logo()+'<span>'+esc(D.company)+' Leave</span></div>'+
     '<div class="who">'+(D.isAdmin?'<a class="adm" href="admin.html">Admin</a>':'')+'<button class="iconbtn" onclick="startTour(false)" title="Show the guide">?</button><button class="iconbtn" id="tTheme" onclick="toggleTheme()" title="Switch theme">◐</button>'+(SID?'<button class="outbtn" onclick="signOutNow()" title="Sign out">Sign out</button>':'')+'<span>'+esc(D.user.name)+'</span><div class="avatar">'+esc(first[0])+'</div></div></header>';
-  h+='<div class="hero">'+flo()+'<div class="bubble" id="say">Hi <b>'+esc(first)+'</b>! I’m Flo. Tap a leave type below to see your balance, then fill in the form to request time off.</div></div>';
 
-  h+=chips();
-  h+='<div class="grid tiles" id="tTiles">';
+  h+='<div class="hero">'+flo()+'<div class="bubble" id="say">'+HINT[TAB](first)+'</div></div>';
+
+  h+='<nav class="tabs" id="tTabs" role="tablist">'+TABS.map(function(t){
+    return '<button role="tab" data-t="'+t[0]+'" class="'+(TAB===t[0]?'on':'')+'" onclick="showTab(\''+t[0]+'\')">'+t[1]+(t[0]==='mine'&&pend?'<i class="bdg">'+pend+'</i>':'')+'</button>';
+  }).join('')+'</nav>';
+
+  /* ---------- Home ---------- */
+  h+='<section class="pane'+(TAB==='home'?' on':'')+'" data-t="home">'+chips()+
+    '<div class="sech"><h3>Your balances</h3><span class="sub">Tap one to request that type</span></div>'+
+    '<div class="grid tiles" id="tTiles">';
   D.balances.forEach(function(b){
-    h+='<div class="card tile'+(b.type===SEL?' sel':'')+'" onclick="pick(\''+esc(b.type)+'\')">'+ring(b)+
+    h+='<div class="card tile'+(b.type===SEL?' sel':'')+'" onclick="pick(\''+esc(b.type)+'\',true)">'+ring(b)+
       '<div><div class="name">'+esc(b.type)+'</div>'+
       '<div class="sub" style="margin-top:3px">'+(b.based?'<b style="color:var(--text)">'+num(b.remaining)+'</b> of '+num(b.total)+' days left':'No fixed limit')+'</div>'+
       '<div class="key">'+(b.based?'<span><i style="background:var(--blue)"></i>Left</span>':'')+(b.pending?'<span><i style="background:var(--warn)"></i>Pending '+num(b.pending)+'</span>':'')+'<span><i style="background:var(--surface2);outline:1px solid var(--line)"></i>Used '+num(b.used)+'</span></div></div></div>';
   });
-  h+='</div>';
+  h+='</div><div class="grid two">'+
+    '<div class="card"><div class="cardh"><h3>Recent requests</h3>'+(D.requests.length?'<button class="link" onclick="showTab(\'mine\')">See all →</button>':'')+'</div><div class="list">'+
+      (D.requests.length?D.requests.slice(0,3).map(function(r,i){return reqItem(r,i,false);}).join(''):'<div class="empty">No requests yet.<br><button class="btn sm" onclick="showTab(\'req\')">Request leave</button></div>')+'</div></div>'+
+    '<div class="card"><div class="cardh"><h3>Away in the next 7 days</h3><button class="link" onclick="showTab(\'cal\')">Calendar →</button></div><div class="list">'+awayList()+'</div></div>'+
+  '</div></section>';
 
-  h+='<div class="grid two"><div class="card" id="tForm"><h3 id="formTitle">Request leave</h3>'+
+  /* ---------- Request leave ---------- */
+  h+='<section class="pane'+(TAB==='req'?' on':'')+'" data-t="req"><div class="formwrap"><div class="card" id="tForm"><h3 id="formTitle">Request leave</h3>'+
     '<label>Leave type</label><select id="type" onchange="pick(this.value)">'+D.balances.map(function(b){return '<option'+(b.type===SEL?' selected':'')+'>'+esc(b.type)+'</option>';}).join('')+'</select>'+
-    '<div class="row"><div><label>First day absent</label><input type="date" id="start" min="" onchange="calc()"></div><div><label>Last day absent</label><input type="date" id="end" onchange="calc()"></div></div>'+
+    '<div class="row"><div><label>First day absent</label><input type="date" id="start" onchange="calc()"></div><div><label>Last day absent</label><input type="date" id="end" onchange="calc()"></div></div>'+
     (D.rules.halfDays?'<label class="chk"><input type="checkbox" id="half" onchange="calc()"> Half day only (single day)</label>':'')+
-    '<div class="dur"><span>Working days</span><b id="dur">0</b></div>'+
+    '<div class="dur"><span>Working days</span><b id="dur">0 days</b></div>'+
     '<label>Reason <span id="reasonNote"></span></label><textarea id="reason" placeholder="Briefly explain the reason for your leave"></textarea>'+
-    '<div class="row"><div><label>Cover person work email (they’ll be asked to confirm)</label><input id="cover" type="email" placeholder="colleague@company.com"></div><div><label>Contact while away (optional)</label><input id="contact" placeholder="Phone or email"></div></div>'+
-    '<details id="hoBox" style="margin-top:14px"><summary style="cursor:pointer;color:var(--blue);font-weight:600">Handover notes (recommended)</summary>'+
+    '<div class="row"><div><label>Cover person’s work email</label><input id="cover" type="email" placeholder="colleague@company.com"></div><div><label>Contact while away (optional)</label><input id="contact" placeholder="Phone or email"></div></div>'+
+    '<details id="hoBox"><summary>Handover notes <span class="sub">(recommended)</span></summary>'+
     '<label>Active tasks</label><textarea id="h_tasks" placeholder="What is in progress right now?"></textarea>'+
     '<label>Deadlines while you are away</label><textarea id="h_deadlines"></textarea>'+
     '<label>Links and resources</label><textarea id="h_links"></textarea>'+
     '<div class="row"><div><label>Escalation contact</label><input id="h_esc"></div><div><label>First task when you return</label><input id="h_first"></div></div></details>'+
     '<div class="err" id="err"></div><button class="btn" id="go" onclick="send()">Send request</button></div>'+
-    '<div class="grid" style="align-content:start">'+
-      '<div class="card" id="tAway"><div id="calBox"></div>'+
-      '<div class="wk"><h4>Away in the next 7 days</h4><div class="list">'+
-      (D.away.length?D.away.map(function(a){return '<div class="item"><div>'+esc(a.name)+'</div><div class="sub">'+range(a.start,a.end)+'</div></div>';}).join(''):'<div class="sub">Everyone is in. 🎉</div>')+'</div></div></div></div></div>';
+    '<aside class="card side" id="side"></aside></div></section>';
 
-  h+='<div class="card" id="tReq" style="margin-top:14px"><h3>My requests</h3><div class="list">'+
-    (D.requests.length?D.requests.map(function(r,i){
-      var acts='';
-      if(r.canEdit)acts+='<div><button class="mini" onclick="editReq('+i+')">Edit &amp; resubmit</button></div>';
-      if(r.canWithdraw)acts+='<div><button class="mini" onclick="act(this,\'withdraw\','+i+')">Withdraw</button></div>';
-      if(r.canCancel)acts+='<div><button class="mini" onclick="act(this,\'cancel\','+i+')">Cancel leave</button></div>';
-      return '<div class="item"><div><div>'+esc(r.type)+' · '+num(r.days)+' day'+(r.days===1?'':'s')+'</div><div class="sub">'+range(r.start,r.end)+' · '+esc(r.id)+(r.coverStatus?' · Cover '+esc(r.coverStatus.toLowerCase()):'')+(r.comment?' · “'+esc(r.comment)+'”':'')+'</div></div><div style="text-align:right"><span class="pill '+pillClass(r.status)+'">'+esc(r.status.replace('Pending Manager Review','Pending'))+'</span>'+acts+'</div></div>';
-    }).join(''):'<div class="sub">No requests yet. Your first one will show up here.</div>')+'</div></div>';
+  /* ---------- My requests ---------- */
+  h+='<section class="pane'+(TAB==='mine'?' on':'')+'" data-t="mine"><div class="card" id="tReq"><div class="cardh"><h3>My requests</h3><span class="sub">Latest 15</span></div><div class="list">'+
+    (D.requests.length?D.requests.map(function(r,i){return reqItem(r,i,true);}).join(''):'<div class="empty">No requests yet. Your first one will show up here.</div>')+'</div></div></section>';
+
+  /* ---------- Team calendar ---------- */
+  h+='<section class="pane'+(TAB==='cal'?' on':'')+'" data-t="cal"><div class="grid calgrid"><div class="card" id="tAway"><div id="calBox"></div></div>'+
+    '<div class="card"><h3>Away in the next 7 days</h3><div class="list">'+awayList()+'</div></div></div></section>';
 
   document.getElementById('app').innerHTML=h;
   var s=document.getElementById('start'),e=document.getElementById('end');
   s.min=D.today;e.min=D.today;
   drawCal();
   setReasonNote();
+  updSide();
+}
+
+/* summary panel beside the request form */
+function updSide(){
+  var box=document.getElementById('side');if(!box||!D)return;var b=bal();if(!b)return;
+  var n=workDays(fval('start'),fval('end')||fval('start'));var hf=document.getElementById('half');if(hf&&hf.checked&&n>0)n=0.5;
+  var r=D.rules,tips=[];
+  if(b.type==='Annual Leave'&&r.noticeDays)tips.push('Annual leave needs at least <b>'+r.noticeDays+' days</b> notice.');
+  if(r.maxDays)tips.push('Requests over <b>'+r.maxDays+' days</b> also need final approval.');
+  tips.push('Tip: you can also pick dates on the <button class="link" onclick="showTab(\'cal\')">Team calendar</button>.');
+  box.innerHTML='<div class="sub up">Your balance</div><div class="sidebal">'+ring(b)+'<div><div class="name">'+esc(b.type)+'</div><div class="sub">'+
+    (b.based?'<b style="color:var(--text)">'+num(b.remaining)+'</b> of '+num(b.total)+' days left':'No fixed limit')+'</div></div></div>'+
+    (n&&b.based?'<div class="after">After this request: <b>'+num(b.remaining-n)+'</b> day'+(b.remaining-n===1?'':'s')+' left</div>':'')+
+    '<div class="tips">'+tips.map(function(t){return '<div>'+t+'</div>';}).join('')+'</div>';
 }
 
 function bal(){return D.balances.filter(function(b){return b.type===SEL;})[0];}
@@ -375,14 +498,14 @@ function calTap(ds){
     var s=document.getElementById('start'),e=document.getElementById('end');
     if(!s.value||s.value!==e.value||ds<s.value){s.value=ds;e.value=ds;}else{e.value=ds;}
     calc();
-    msg+='<div class="sub" style="margin-top:4px">Leave dates set to '+range(s.value,e.value)+'. Tap another day to change the last day.</div>';
+    msg+='<div class="sub" style="margin-top:4px">Leave dates set to '+range(s.value,e.value)+'. Tap another day to change the last day. <button class="link" onclick="showTab(\'req\')">Continue to request →</button></div>';
   }
   info=document.getElementById('dayInfo');info.innerHTML=msg;info.style.display='block';
 }
 function EDIT_LOCK(){var h=document.getElementById('half');return !!(h&&h.checked);}
 function setReasonNote(){var b=bal();var n=document.getElementById('reasonNote');if(n&&b)n.textContent=b.reasonRequired?'(required)':'(optional)';}
 
-function pick(t){
+function pick(t,go){
   SEL=t;
   document.querySelectorAll('.tile').forEach(function(el){el.classList.remove('sel');});
   var tiles=document.querySelectorAll('.tile');
@@ -390,6 +513,7 @@ function pick(t){
   document.getElementById('type').value=t;
   setReasonNote();
   var b=bal();
+  if(go)showTab('req',true);
   say('Great choice. '+(b.based?'You have <b>'+num(b.remaining)+' day'+(b.remaining===1?'':'s')+'</b> of '+esc(t)+' left. ':'')+'Now pick your dates, and I’ll skip weekends and public holidays for you.');
   calc();
 }
@@ -410,7 +534,7 @@ function calc(){
   var n=workDays(s.value,e.value);
   if(half&&half.checked&&n>0)n=0.5;
   document.getElementById('dur').textContent=num(n)+(n===1?' day':' days');
-  drawCal();
+  drawCal();updSide();
   var b=bal();
   if(s.value&&e.value){
     if(n===0)say('Those dates fall on a weekend or public holiday, so no leave is needed.');
@@ -429,7 +553,7 @@ function send(){
     handover:{tasks:document.getElementById('h_tasks').value,deadlines:document.getElementById('h_deadlines').value,links:document.getElementById('h_links').value,escalation:document.getElementById('h_esc').value,first:document.getElementById('h_first').value}};
   btn.disabled=true;btn.textContent='Sending…';
   google.script.run.withSuccessHandler(function(r){
-    toast('Request '+r.id+' sent ✔');EDIT=null;
+    toast('Request '+r.id+' sent ✔');EDIT=null;TAB='mine';
     load();
     setTimeout(function(){say('All done! Your request is with your manager now. You’ll get an email when they decide.');},700);
   }).withFailureHandler(function(e){
@@ -442,6 +566,7 @@ function send(){
 
 function editReq(i){
   var r=D.requests[i];EDIT=r.id;
+  showTab('req',true);
   pick(r.type);
   document.getElementById('start').value=r.start;document.getElementById('end').value=r.end;
   var h=document.getElementById('half');if(h)h.checked=!!r.half;
@@ -465,7 +590,8 @@ function act(btn,kind,i){
 
 var TOUR=[
   {t:null,title:'Welcome to Stableflow Leave 👋',text:'Hi {name}! I’m Flo. This quick tour shows you everything in about a minute, so you can request time off with confidence.'},
-  {t:'tTiles',title:'Your leave balances',text:'Each tile is a leave type. It shows days remaining after approved and pending requests. Tap a tile to pick that type.'},
+  {t:'tTabs',title:'Find your way around',text:'Everything now has its own tab: Home, Request leave, My requests and Team calendar. Tap a tab to switch.'},
+  {t:'tTiles',title:'Your leave balances',text:'Each ring is a leave type. It shows days remaining after approved and pending requests. Tap one to start a request of that type.'},
   {t:'tForm',title:'Request leave here',text:'Choose the type and your dates. I count working days live and skip weekends and public holidays. You can also pick a half day for a single day.'},
   {t:'hoBox',title:'Handover and cover',text:'Add handover notes and name a cover person. They get an email to confirm, and your approver sees it all before deciding.'},
   {t:'tReq',title:'Track your requests',text:'See every request and its status. You can withdraw a pending one, edit and resubmit if changes are requested, or cancel approved leave that hasn’t started.'},
@@ -486,6 +612,9 @@ function drawTour(){
     (!tourFirst?'<button class="cl" onclick="endTour()">Close</button>':'')+(tourI>0?'<button class="bk" onclick="tourGo(-1)">Back</button>':'')+
     '<button class="nx" onclick="tourGo(1)">'+(last?(tourFirst?'Let’s go':'Done'):'Next')+'</button></div></div>';
   var el=s.t?document.getElementById(s.t):null;
+  var pn=el&&el.closest?el.closest('.pane'):null;
+  if(pn&&!pn.classList.contains('on'))showTab(pn.getAttribute('data-t'),true);
+  if(el&&s.t==='hoBox')el.open=true;
   if(el){el.classList.add('spot');el.scrollIntoView({behavior:'smooth',block:'start'});}else{window.scrollTo({top:0,behavior:'smooth'});}
 }
 function tourGo(d){
@@ -495,6 +624,7 @@ function tourGo(d){
 function endTour(){
   clearSpot();
   ['tourBack','tour'].forEach(function(id){var el=document.getElementById(id);if(el)el.remove();});
+  showTab('home');
   window.scrollTo({top:0,behavior:'smooth'});
   if(tourFirst){D.tourDone=true;google.script.run.markTourDone(SID);}
 }
